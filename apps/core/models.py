@@ -1,6 +1,8 @@
 import uuid
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils.text import slugify
+from django_tenants.models import TenantMixin, DomainMixin
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -9,31 +11,34 @@ class TimeStampedModel(models.Model):
     class Meta:
         abstract = True
 
-class Organization(TimeStampedModel):
+class Tenant(TenantMixin, TimeStampedModel):
     """
-    The Tenant. Each customer is an Organization.
-    Modules can be enabled/disabled per organization (feature flags).
+    Each customer is an Tenant.
+    Modules can be enabled/disabled per Tenant (feature flags).
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Name"), max_length=255)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, blank=True)
     is_active = models.BooleanField(default=True)
-    
-    # Simple JSON field to store active modules, e.g., ["sales", "finance"]
-    # In a real SaaS, this might be a separate relation or License model.
-    active_modules = models.JSONField(default=list, blank=True)
 
     def __str__(self):
         return self.name
 
-class OrganizationAwareModel(TimeStampedModel):
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+class Domain(DomainMixin):
+    pass
+
+class TenantAwareModel(TimeStampedModel):
     """
     Mixin for models that belong to a specific tenant.
     """
-    organization = models.ForeignKey(
-        Organization, 
+    tenant = models.ForeignKey(
+        Tenant, 
         on_delete=models.CASCADE, 
-        related_name="%(class)s_set"
+        related_name="%(class)s_tenant"
     )
 
     class Meta:

@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 
-class SalesConfig(AppConfig):
+class EntitiesConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.sales'
+    name = 'apps.entities'
+    verbose_name = 'Entities'

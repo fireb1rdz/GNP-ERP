@@ -11,29 +11,40 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import environ
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-
 # Application definition
 
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+
+environ.Env.read_env(os.path.join(BASE_DIR,'.env'))
+
+SECRET_KEY = env('SECRET_KEY')
+
 SHARED_APPS = (
-    'django_tenants',  # mandatory
-    'apps.core', # you must list the app where your tenant model resides in
+    'django_tenants',  
+    'apps.core',
     'django.contrib.contenttypes',
+    'django.contrib.staticfiles'
+)
+
+TENANT_APPS = (
+    'apps.entities',
+    'apps.accounts',
     'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.admin',
-)
-
-TENANT_APPS = (
-    # your tenant-specific apps
 )
 
 INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
@@ -54,7 +65,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, "apps", "core", "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -65,6 +76,7 @@ TEMPLATES = [
         },
     },
 ]
+print(TEMPLATES)
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
@@ -112,13 +124,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "apps", "core", "static"),
+]
+print(STATICFILES_DIRS)
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Tenant configuration
-TENANT_MODEL = "apps.core.Tenant"
-TENANT_DOMAIN_MODEL = "apps.core.Domain"
+TENANT_MODEL = "core.Tenant"
+TENANT_DOMAIN_MODEL = "core.Domain"
+
+AUTH_USER_MODEL = 'accounts.User'

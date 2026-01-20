@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <title>Transport ERP</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{% static 'base/css/base.css' %}">
+    </head>
+    <body>
+        <header class="header">
+            <div class="header-container">
+                <div class="logo">Transport ERP</div>
+                <div class="user-info">
+                    <span class="company-name">{{ company.name|default:"Company Name" }}</span>
+                    <div class="user-dropdown">
+                        <button class="user-trigger">
+                            <img src="{% static 'avatar.jpg' %}" alt="Avatar">
+                            <span>{{ request.user.first_name|default:"Usuário" }}</span>
+                        </button>
+                        <ul class="user-menu">
+                            <li>
+                                <a href="#">Perfil</a>
+                            </li>
+                            <li>
+                                <a href="#">Configurações</a>
+                            </li>
+                            <li>
+                                <a href="#">Sair</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <aside class="sidebar">
+            <nav>
+                <ul class="menu">
+                    <li class="menu-item">
+                        <a href="#">Dashboard</a>
+                    </li>
+                    <li class="menu-item has-submenu">
+                        <a href="#">Logística</a>
+                        <ul class="submenu">
+                            <li>
+                                <a href="#">Coletas</a>
+                            </li>
+                            <li>
+                                <a href="#">Entregas</a>
+                            </li>
+                            <li>
+                                <a href="#">Bipagem</a>
+                            </li>
+                            <li>
+                                <a href="#">Rastreamento</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="menu-item has-submenu">
+                        <a href="#">Operações</a>
+                        <ul class="submenu">
+                            <li>
+                                <a href="#">Manifestos</a>
+                            </li>
+                            <li>
+                                <a href="#">Romaneios</a>
+                            </li>
+                            <li>
+                                <a href="#">Ocorrências</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="menu-item has-submenu">
+                        <a href="#">Financeiro</a>
+                        <ul class="submenu">
+                            <li>
+                                <a href="#">Faturas</a>
+                            </li>
+                            <li>
+                                <a href="#">Contas a Pagar</a>
+                            </li>
+                            <li>
+                                <a href="#">Contas a Receber</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="menu-item has-submenu">
+                        <a href="#">Relatórios</a>
+                        <ul class="submenu">
+                            <li>
+                                <a href="#">Operacionais</a>
+                            </li>
+                            <li>
+                                <a href="#">Financeiros</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">Configurações</a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <nav class="breadcrumb">
+                <a href="#">Dashboard</a>
+                <span>/</span>
+                <span>Visão Geral</span>
+            </nav>
+            <h1>Bem-vindo ao Transport ERP</h1>
+            <p>Gerencie logística, operações e financeiro em um único sistema.</p>
+        </main>
+        <script src="{% static 'base/js/base.js' %}"></script>
+    </body>
+</html>

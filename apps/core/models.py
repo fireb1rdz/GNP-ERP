@@ -24,6 +24,9 @@ class Tenant(TenantMixin, TimeStampedModel):
     def __str__(self):
         return self.name
 
+    def has_module(self, module_name):
+        return self.tenant_modules.filter(module__name=module_name).exists()
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
@@ -43,3 +46,20 @@ class TenantAwareModel(TimeStampedModel):
 
     class Meta:
         abstract = True
+
+class Module(TimeStampedModel):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+
+class TenantModule(TimeStampedModel):
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="tenant_modules")
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name="tenant_modules")
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.tenant.name} - {self.module}"
+

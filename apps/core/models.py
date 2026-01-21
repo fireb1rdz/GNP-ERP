@@ -1,5 +1,5 @@
 import uuid
-from django.db import models
+from django.db import models, connection
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from django_tenants.models import TenantMixin, DomainMixin
@@ -47,6 +47,19 @@ class TenantAwareModel(TimeStampedModel):
     class Meta:
         abstract = True
 
+    def save(self, *args, **kwargs):
+        if not self.tenant_id:
+            tenant = getattr(connection, "tenant", None)
+
+            if tenant is None:
+                raise RuntimeError(
+                    "Nenhum tenant ativo no contexto da conexão"
+                )
+
+            self.tenant = tenant
+
+        super().save(*args, **kwargs)
+        
 class Module(TimeStampedModel):
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)

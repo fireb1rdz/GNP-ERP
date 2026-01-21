@@ -1,19 +1,27 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Submenu sidebar
     document.querySelectorAll('.menu-item.has-submenu > a')
         .forEach(link => {
             link.addEventListener('click', event => {
                 event.preventDefault();
-                link.parentElement.classList.toggle('active');
+
+                const current = link.parentElement;
+
+                document.querySelectorAll('.menu-item.has-submenu')
+                    .forEach(item => {
+                        if (item !== current) {
+                            item.classList.remove('active');
+                        }
+                    });
+
+                current.classList.toggle('active');
             });
         });
 
-    // Dropdown do usuário
     const trigger = document.querySelector('.user-trigger');
     const menu = document.querySelector('.user-menu');
 
-    if (trigger) {
+    if (trigger && menu) {
         trigger.addEventListener('click', e => {
             e.stopPropagation();
             menu.classList.toggle('open');

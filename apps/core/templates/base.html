@@ -3,113 +3,151 @@
 <html lang="pt-br">
     <head>
         <meta charset="UTF-8">
-        <title>Transport ERP</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="{% static 'base/css/base.css' %}">
+        <title>GNP</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+              rel="stylesheet">
     </head>
-    <body>
-        <header class="header">
-            <div class="header-container">
-                <div class="logo">Transport ERP</div>
-                <div class="user-info">
-                    <span class="company-name">{{ company.name|default:"Company Name" }}</span>
-                    <div class="user-dropdown">
-                        <button class="user-trigger">
-                            <img src="{% static 'avatar.jpg' %}" alt="Avatar">
-                            <span>{{ request.user.first_name|default:"Usuário" }}</span>
-                        </button>
-                        <ul class="user-menu">
-                            <li>
-                                <a href="#">Perfil</a>
-                            </li>
-                            <li>
-                                <a href="#">Configurações</a>
-                            </li>
-                            <li>
-                                <a href="#">Sair</a>
-                            </li>
-                        </ul>
+    <body class="bg-light">
+        <!-- NAVBAR -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+            <div class="container-fluid">
+                <!-- Logo -->
+                <a class="navbar-brand fw-semibold" href="#">GNP</a>
+                <!-- Mobile toggle -->
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#mainNavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <!-- Navbar content -->
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <!-- Menu -->
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">Dashboard</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               role="button"
+                               data-bs-toggle="dropdown">Logística</a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="#">Coletas</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">Entregas</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">Bipagem</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">Rastreamento</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               role="button"
+                               data-bs-toggle="dropdown">Operações</a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="#">Manifestos</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">Romaneios</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">Ocorrências</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               role="button"
+                               data-bs-toggle="dropdown">Financeiro</a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="#">Faturas</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">Contas a Pagar</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">Contas a Receber</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               role="button"
+                               data-bs-toggle="dropdown">Relatórios</a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="#">Operacionais</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">Financeiros</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Configurações</a>
+                        </li>
+                    </ul>
+                    <!-- Empresa + usuário -->
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-secondary small">{{ company.name|default:"Company Name" }}</span>
+                        <div class="dropdown">
+                            <a href="#"
+                               class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                               data-bs-toggle="dropdown">
+                                <img src="{% static 'avatar.jpg' %}"
+                                     alt="avatar"
+                                     width="32"
+                                     height="32"
+                                     class="rounded-circle me-2">
+                                <strong>{{ request.user.first_name|default:"Usuário" }}</strong>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="#">Perfil</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">Configurações</a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="#">Sair</a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </header>
-        <aside class="sidebar">
-            <nav>
-                <ul class="menu">
-                    <li class="menu-item">
+        </nav>
+        <!-- CONTEÚDO -->
+        <main class="container-fluid mt-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
                         <a href="#">Dashboard</a>
                     </li>
-                    <li class="menu-item has-submenu">
-                        <a href="#">Logística</a>
-                        <ul class="submenu">
-                            <li>
-                                <a href="#">Coletas</a>
-                            </li>
-                            <li>
-                                <a href="#">Entregas</a>
-                            </li>
-                            <li>
-                                <a href="#">Bipagem</a>
-                            </li>
-                            <li>
-                                <a href="#">Rastreamento</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="menu-item has-submenu">
-                        <a href="#">Operações</a>
-                        <ul class="submenu">
-                            <li>
-                                <a href="#">Manifestos</a>
-                            </li>
-                            <li>
-                                <a href="#">Romaneios</a>
-                            </li>
-                            <li>
-                                <a href="#">Ocorrências</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="menu-item has-submenu">
-                        <a href="#">Financeiro</a>
-                        <ul class="submenu">
-                            <li>
-                                <a href="#">Faturas</a>
-                            </li>
-                            <li>
-                                <a href="#">Contas a Pagar</a>
-                            </li>
-                            <li>
-                                <a href="#">Contas a Receber</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="menu-item has-submenu">
-                        <a href="#">Relatórios</a>
-                        <ul class="submenu">
-                            <li>
-                                <a href="#">Operacionais</a>
-                            </li>
-                            <li>
-                                <a href="#">Financeiros</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="menu-item">
-                        <a href="#">Configurações</a>
-                    </li>
-                </ul>
+                    <li class="breadcrumb-item active">Visão Geral</li>
+                </ol>
             </nav>
-        </aside>
-        <main class="main-content">
-            <nav class="breadcrumb">
-                <a href="#">Dashboard</a>
-                <span>/</span>
-                <span>Visão Geral</span>
-            </nav>
-            <h1>Bem-vindo ao Transport ERP</h1>
-            <p>Gerencie logística, operações e financeiro em um único sistema.</p>
+            <h1 class="fw-semibold">Bem-vindo ao GNP</h1>
+            <p class="text-muted">Gerencie logística, operações e financeiro em um único sistema.</p>
         </main>
-        <script src="{% static 'base/js/base.js' %}"></script>
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

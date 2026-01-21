@@ -39,7 +39,7 @@ SHARED_APPS = (
 
 TENANT_APPS = (
     'apps.entities',
-    'apps.accounts',
+    'apps.users',
     'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.sites',
@@ -76,8 +76,6 @@ TEMPLATES = [
         },
     },
 ]
-print(TEMPLATES)
-
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
@@ -129,7 +127,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "apps", "core", "static"),
 ]
-print(STATICFILES_DIRS)
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -139,4 +137,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 TENANT_MODEL = "core.Tenant"
 TENANT_DOMAIN_MODEL = "core.Domain"
 
-AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = 'users.User'

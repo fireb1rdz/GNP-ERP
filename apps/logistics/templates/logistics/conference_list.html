@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Data</th>
+                    <th>Horário</th>
+                    <th>Local</th>
+                    <th>Descrição</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for conference in conferences %}
+                    <tr>
+                        <td>{{ conference.source_entity.entity.name }}</td>
+                        <td>{{ conference.date }}</td>
+                        <td>{{ conference.time }}</td>
+                        <td>{{ conference.location }}</td>
+                        <td>{{ conference.description }}</td>
+                        <td>
+                            <a href="{% url 'logistics:conference_detail' conference.id %}"
+                               class="btn btn-primary">Detalhes</a>
+                            <a href="{% url 'logistics:conference_update' conference.id %}"
+                               class="btn btn-warning">Editar</a>
+                            <a href="{% url 'logistics:conference_delete' conference.id %}"
+                               class="btn btn-danger">Excluir</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}

@@ -2,13 +2,15 @@ from django.views import View
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import transaction
+from django.views.generic import ListView
+from .models import Conference
 
 from .forms import ConferenceCreateForm
 from .services.conference_service import ConferenceService
 
 
 class ConferenceCreateView(View):
-    template_name = "logistics/conference/create.html"
+    template_name = "logistics/conference_create.html"
 
     def get(self, request):
         form = ConferenceCreateForm()
@@ -49,3 +51,8 @@ class ConferenceCreateView(View):
         except Exception as e:
             messages.error(request, str(e))
             return render(request, self.template_name, {"form": form})
+
+class ConferenceListView(ListView):
+    model = Conference
+    context_object_name = "conferences"
+    paginate_by = 10

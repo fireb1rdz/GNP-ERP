@@ -1,31 +1,45 @@
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
 from decimal import Decimal
 import datetime
+from domain.dto.party import PartyDTO
 
 @dataclass
-class CTeVolumeDTO:
+class DocumentVolumeDTO:
     quantity: int
     description: Optional[str]
     weight: Optional[Decimal]
     value: Optional[Decimal]
 
-
 @dataclass
-class CTeDTO:
+class DocumentDTO:
     id: str
     model: str
     series: int
     number: int
-    issue_datetime: datetime.datetime
+    issue_datetime: datetime
     environment: str
+
+    supplier: PartyDTO
+    carrier: PartyDTO
+    client: PartyDTO
+
+    raw_xml: str
+
+@dataclass 
+class CTEDTO(DocumentDTO):
     cfop: str
     nature_operation: str
     modal: str
-
-    supplier: object
-    client: object
-
+    route: dict
+    freight: dict
+    icms: dict
+    cargo: dict
+    related_nfes: list
+    road: dict | None
+    authorization: dict | None
+    observations: list  
+    modal: str
     route: dict
     freight: dict
     icms: dict
@@ -35,4 +49,5 @@ class CTeDTO:
     authorization: dict | None
     observations: list
 
-    raw_xml: str
+    def iter_items(self):
+        return []

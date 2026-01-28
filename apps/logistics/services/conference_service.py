@@ -2,42 +2,42 @@
 import xml.etree.ElementTree as ET
 from django.utils.timezone import now
 
-from .models import Conference, ConferenceItem
-from apps.stock.services import PackageService
-from apps.core.services.base import ModuleRegistry
-from apps.core.services.logistics import ConferenceServiceInterface
+from apps.logistics.models import Conference, ConferenceItem
+from domain.contracts.stock import PackageServiceInterface
+from domain.registry.module_registry import ModuleRegistry
+from domain.contracts.logistics import ConferenceServiceInterface
+
 
 class ConferenceService(ConferenceServiceInterface):
+    def __init__(self, package_service: PackageServiceInterface):
+        self.package_service = package_service
 
-    @staticmethod
-    def create_from_cte(*, tenant, user, carrier_entity, cte_files):
+    def create_from_source(self, *, tenant, user, source_files):
         fiscal = ModuleRegistry.get("fiscal")
 
         if not fiscal:
             raise RuntimeError("Módulo fiscal não disponível")
 
-        for xml in cte_files:
-            cte = fiscal.import_cte(xml)
+        for xml in source_files:
+            source = fiscal.import_document(xml)
 
             conference = Conference.objects.create(
                 tenant=tenant,
-                source_entity=cte.supplier,
-                shipping_entity=carrier_entity,
-                destination_entity=cte.client,
-                invoice=cte.id,
+                source_entity=source.supplier,
+                shipping_entity=source.carrier,
+                destination_entity=source.client,
+                invoice=source.id,
                 status="pending",
-                start_date=now(),
                 created_by=user,
             )
 
-            ConferenceService._create_items_from_cte(
+            self.create_items_from_source(
                 tenant=tenant,
                 conference=conference,
-                cte=cte,
+                source=source,
             )
 
-    @staticmethod
-    def _create_items_from_cte(*, tenant, conference, cte):
+    def create_items_from_source(self,*, tenant, conference, source):
         """
         Para cada volume/produto da NF:
         - cria um Package
@@ -45,14 +45,13 @@ class ConferenceService(ConferenceServiceInterface):
         - cria ConferenceItem
         """
 
-        package_service = PackageService()
 
-        for item in cte.items:
-            # Se a NF não tiver volume, assume 1
+        for item in source.iter_items():
+            # Se o documento não tiver volume, assume 1
             quantity = item.quantity or 1
 
             for _ in range(quantity):
-                package = package_service.create_generated_package(
+                package = self.package_service.create_generated_package(
                     tenant=tenant,
                     product_description=item.description,
                 )

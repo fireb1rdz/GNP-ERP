@@ -15,12 +15,13 @@ class Entity(TenantAwareModel):
     cpforcnpj = models.CharField(max_length=4, choices=choices.items(), default='CNPJ')
     economic_group = models.ForeignKey('self', on_delete=models.PROTECT, null=True, blank=True, related_name='economic_groups')
     is_active = models.BooleanField(default=True)
-    is_client = models.BooleanField(default=False)
-    is_carrier = models.BooleanField(default=False)
     is_branch = models.BooleanField(default=False)
     is_system = models.BooleanField(default=False, help_text='Allow access to the entity as system company')
 
     def __str__(self):
+        return self.name
+
+    def __repr__(self):
         return self.name
 
     def save(self, *args, **kwargs):
@@ -60,3 +61,37 @@ class EntityPhone(TenantAwareModel):
 
     def __str__(self):
         return f"{self.entity.name} - {self.phone}"
+
+class PartyRole(models.TextChoices):
+    CLIENT = "client", "Client"
+    SUPPLIER = "supplier", "Supplier"
+    CARRIER = "carrier", "Carrier"
+    SENDER  = "sender", "Sender"
+    RECEIVER = "receiver", "Receiver"
+    WAREHOUSE = "warehouse", "Warehouse"
+
+class Party(TenantAwareModel):
+    """
+    Representa o papel de uma Entity em um contexto.
+    Ex.: Cliente, Fornecedor, Transportadora.
+    """
+    entity = models.ForeignKey(
+        'Entity',
+        on_delete=models.PROTECT,
+        related_name='parties'
+    )
+    role = models.CharField(
+        max_length=20,
+        choices=PartyRole.choices,
+        default=PartyRole.CLIENT
+    )
+    alias = models.CharField(max_length=100, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('entity', 'role')
+        verbose_name = 'Party'
+        verbose_name_plural = 'Parties'
+
+    def __str__(self):
+        return f"{self.entity.name} ({self.role})"

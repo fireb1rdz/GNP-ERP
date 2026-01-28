@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.db import transaction
 
 from .forms import ConferenceCreateForm
-from .services import ConferenceService
+from .services.conference_service import ConferenceService
 
 
 class ConferenceCreateView(View):

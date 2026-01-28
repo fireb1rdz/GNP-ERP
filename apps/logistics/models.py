@@ -2,8 +2,7 @@ from django.db import models
 from apps.core.models import TenantAwareModel
 from django.contrib.auth import get_user_model
 from apps.stock.models import Package
-from apps.entities.models import Entity
-
+from apps.entities.models import Party
 
 User = get_user_model()
 
@@ -17,9 +16,9 @@ class Conference(TenantAwareModel):
     DOCUMENT_TYPE_CHOICES = (
         ('invoice', 'Invoice'),
     )
-    source_entity = models.ForeignKey(Entity, on_delete=models.PROTECT, related_name="source_conferences")
-    shipping_entity = models.ForeignKey(Entity, on_delete=models.PROTECT, related_name="shipping_conferences")
-    destination_entity = models.ForeignKey(Entity, on_delete=models.PROTECT, related_name="destination_conferences")
+    source_entity = models.ForeignKey(Party, on_delete=models.PROTECT, related_name="source_conferences", null=True, blank=True)
+    carrier_entity = models.ForeignKey(Party, on_delete=models.PROTECT, related_name="carrier_conferences", null=True, blank=True)
+    client_entity = models.ForeignKey(Party, on_delete=models.PROTECT, related_name="client_conferences", null=True, blank=True)
     document_number = models.CharField(max_length=44, null=True, blank=True)
     document_type = models.CharField(max_length=20, choices=DOCUMENT_TYPE_CHOICES, default='invoice')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')

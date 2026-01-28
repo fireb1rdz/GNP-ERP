@@ -1,11 +1,12 @@
 from django.db import models
 from apps.core.models import TenantAwareModel
 from django.core.validators import MinValueValidator
+from apps.entities.models import Party
 
 class Invoice(TenantAwareModel):
-    client = models.IntegerField(help_text="ID do cliente no sistema")
-    supplier = models.IntegerField(help_text="ID do fornecedor no sistema")
-    carrier = models.IntegerField(help_text="ID do transportador no sistema")
+    client = models.ForeignKey(Party, on_delete=models.PROTECT)
+    supplier = models.ForeignKey(Party, on_delete=models.PROTECT)
+    carrier = models.ForeignKey(Party, on_delete=models.PROTECT)
 
     # Identificação fiscal
     access_key = models.CharField(max_length=44, unique=True)  # Id da infNFe
@@ -149,10 +150,10 @@ class TransportDocument(TenantAwareModel):
         ("57", "CT-e"),
     )
     STATUS_CHOICES = (
-        ("draft", "Rascunho"),
-        ("authorized", "Autorizado"),
-        ("cancelled", "Cancelado"),
-        ("denied", "Denegado"),
+        ("draft", "Draft"),
+        ("authorized", "Authorized"),
+        ("cancelled", "Cancelled"),
+        ("denied", "Denied"),
     )
     internal_code = models.CharField(
         max_length=30,
@@ -172,13 +173,13 @@ class TransportDocument(TenantAwareModel):
     issue_datetime = models.DateTimeField()
     environment = models.CharField(
         max_length=10,
-        choices=(("prod", "Produção"), ("test", "Homologação"))
+        choices=(("prod", "Production"), ("test", "Test"))
     )
     cfop = models.CharField(max_length=4)
     nature_operation = models.CharField(max_length=255)
     modal = models.CharField(
         max_length=10,
-        choices=(("road", "Rodoviário"),)
+        choices=(("road", "Road"),)
     )
     status = models.CharField(
         max_length=15,
@@ -221,16 +222,16 @@ class Issuer(TenantAwareModel):
     tax_regime = models.CharField(
         max_length=20,
         choices=(
-            ("simple", "Simples Nacional"),
-            ("real", "Lucro Real"),
-            ("presumed", "Lucro Presumido"),
+            ("simple", "Simple"),
+            ("real", "Real"),
+            ("presumed", "Presumed"),
         )
     )
 
 class TransportParty(TenantAwareModel):
     PARTY_TYPE = (
-        ("sender", "Remetente"),
-        ("recipient", "Destinatário"),
+        ("sender", "Sender"),
+        ("recipient", "Recipient"),
     )
     document = models.ForeignKey(
         TransportDocument,
@@ -298,7 +299,7 @@ class CargoMeasurement(models.Model):
     type = models.CharField(
         max_length=10,
         choices=(
-            ("weight", "Peso"),
+            ("weight", "Weight"),
             ("volume", "Volume"),
         )
     )

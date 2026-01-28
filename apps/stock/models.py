@@ -1,5 +1,6 @@
 from django.db import models, connection
 from apps.core.models import TenantAwareModel
+from apps.entities.models import Party
 
 class PhysicalSpaceManager(models.Manager):
     def descendants_of(self, root_id, from_type=None):
@@ -55,8 +56,8 @@ class Package(TenantAwareModel):
         ('delivered', 'Delivered'),
         ('cancelled', 'Cancelled'),
     )
-    created_by_entity = models.IntegerField(help_text="Entity that created the package")
-    warehouse_entity = models.IntegerField(help_text="Warehouse entity that owns the package")
+    created_by = models.ForeignKey(Party, related_name="created_packages", on_delete=models.PROTECT)
+    holder = models.ForeignKey(Party, related_name="stored_packages", on_delete=models.PROTECT)
     tracking_code = models.CharField(max_length=120, db_index=True)
     product_description = models.CharField(max_length=500, null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='generated')
@@ -74,17 +75,17 @@ class Package(TenantAwareModel):
         return self.length * self.width * self.height
 
 class PhysicalSpace(TenantAwareModel):
-    entity = models.IntegerField()
+    holder = models.ForeignKey(Party, on_delete=models.PROTECT)
     SPACE_TYPE_CHOICES = (
-        ("WAREHOUSE", "Warehouse"),
-        ("ZONE", "Zone"),
-        ("AISLE", "Aisle"),
-        ("RACK", "Rack"),
-        ("LEVEL", "Level"),
-        ("BIN", "Bin"),
-        ("FLOOR", "Floor Area"),
-        ("DOCK", "Dock"),
-        ("STAGING", "Staging"),
+        ("WAREHOUSE", "warehouse"),
+        ("ZONE", "zone"),
+        ("AISLE", "aisle"),
+        ("RACK", "rack"),
+        ("LEVEL", "level"),
+        ("BIN", "bin"),
+        ("FLOOR", "floor"),
+        ("DOCK", "dock"),
+        ("STAGING", "staging"),
     )
 
     parent = models.ForeignKey(

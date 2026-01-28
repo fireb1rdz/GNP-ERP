@@ -10,11 +10,16 @@ class EntityCreateView(CreateView):
     def form_valid(self, form):
         messages.success(self.request, 'Entidade criada com sucesso!')
         return super().form_valid(form)
+    def form_invalid(self, form):
+        messages.warning(self.request, f'Erro ao criar entidade! {form.errors}')
+        return super().form_invalid(form)
     
 class EntityListView(ListView):
     model = Entity
     context_object_name = "entities"
-    paginate_by = 2
+    paginate_by = 15
+    def get_queryset(self):
+        return Entity.objects.filter(tenant=self.request.tenant)
     
 class EntityUpdateView(UpdateView):
     model = Entity

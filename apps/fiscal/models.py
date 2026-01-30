@@ -4,9 +4,9 @@ from django.core.validators import MinValueValidator
 from apps.entities.models import Party
 
 class Invoice(TenantAwareModel):
-    client = models.ForeignKey(Party, on_delete=models.PROTECT)
-    supplier = models.ForeignKey(Party, on_delete=models.PROTECT)
-    carrier = models.ForeignKey(Party, on_delete=models.PROTECT)
+    client = models.ForeignKey(Party, on_delete=models.PROTECT, related_name="invoices_as_client")
+    supplier = models.ForeignKey(Party, on_delete=models.PROTECT, related_name="invoices_as_supplier")
+    carrier = models.ForeignKey(Party, on_delete=models.PROTECT, related_name="invoices_as_carrier")
 
     # Identificação fiscal
     access_key = models.CharField(max_length=44, unique=True)  # Id da infNFe

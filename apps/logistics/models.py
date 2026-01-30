@@ -19,6 +19,7 @@ class Conference(TenantAwareModel):
     supplier = models.ForeignKey(Party, on_delete=models.PROTECT, related_name="supplier_conferences", null=True, blank=True)
     carrier = models.ForeignKey(Party, on_delete=models.PROTECT, related_name="carrier_conferences", null=True, blank=True)
     client = models.ForeignKey(Party, on_delete=models.PROTECT, related_name="client_conferences", null=True, blank=True)
+    next_destiny = models.ForeignKey(Party, on_delete=models.PROTECT, related_name="next_destiny_conferences")
     document_number = models.CharField(max_length=44, null=True, blank=True)
     document_type = models.CharField(max_length=20, choices=DOCUMENT_TYPE_CHOICES, default='invoice')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
@@ -29,6 +30,7 @@ class Conference(TenantAwareModel):
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
     finished_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name="finished_conferences", null=True, blank=True)
+    items_added = models.BooleanField(default=False)
 
 class ConferenceItem(TenantAwareModel):
     STATUS_CHOICES = (

@@ -22,3 +22,8 @@ class ConferenceServiceInterface(ABC):
     @abstractmethod
     def create_from_xml(self, tenant, user, carrier_entity, xml_files):
         pass
+
+class ConferenceApplicationServiceInterface(ABC):
+    @abstractmethod
+    def create_conference(self, tenant, user, carrier_entity, xml_files):
+        pass

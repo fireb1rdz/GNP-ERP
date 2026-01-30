@@ -1,25 +1,52 @@
 {% extends 'base.html' %}
+{% block title %}
+    Conferências
+{% endblock title %}
+{% block head %}
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script>
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    </script>
+{% endblock head %}
 {% block content %}
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Nome</th>
-                    <th>Data</th>
-                    <th>Horário</th>
-                    <th>Local</th>
-                    <th>Descrição</th>
+                    <th>Origem</th>
+                    <th>Transportadora</th>
+                    <th>Destino</th>
+                    <th>N. Documento</th>
+                    <th>Tipo Documento</th>
+                    <th>Início</th>
+                    <th>Fim</th>
+                    <th>Status</th>
                     <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
                 {% for conference in conferences %}
                     <tr>
-                        <td>{{ conference.source_entity.entity.name }}</td>
-                        <td>{{ conference.date }}</td>
-                        <td>{{ conference.time }}</td>
-                        <td>{{ conference.location }}</td>
-                        <td>{{ conference.description }}</td>
+                        <td data-bs-toggle="tooltip"
+                            data-bs-title="{{ conference.supplier.entity.name }}">
+                            {{ conference.supplier.entity.id }} - {{ conference.supplier.entity.name }}
+                        </td>
+                        <td data-bs-toggle="tooltip"
+                            data-bs-title="{{ conference.carrier.entity.name }}">
+                            {{ conference.carrier.entity.id }} - {{ conference.carrier.entity.name }}
+                        </td>
+                        <td data-bs-toggle="tooltip"
+                            data-bs-title="{{ conference.client.entity.name }}">
+                            {{ conference.client.entity.id }} - {{ conference.client.entity.name }}
+                        </td>
+                        <td data-bs-toggle="tooltip"
+                            data-bs-title="{{ conference.document_number }}">{{ conference.document_number }}</td>
+                        <td data-bs-toggle="tooltip"
+                            data-bs-title="{{ conference.document_type }}">{{ conference.document_type }}</td>
+                        <td data-bs-toggle="tooltip" data-bs-title="{{ conference.start_date }}">{{ conference.start_date }}</td>
+                        <td data-bs-toggle="tooltip" data-bs-title="{{ conference.end_date }}">{{ conference.end_date }}</td>
+                        <td data-bs-toggle="tooltip" data-bs-title="{{ conference.status }}">{{ conference.status }}</td>
                         <td>
                             <a href="{% url 'logistics:conference_detail' conference.id %}"
                                class="btn btn-primary">Detalhes</a>

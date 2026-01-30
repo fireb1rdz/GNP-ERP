@@ -3,7 +3,10 @@
 <html lang="pt-br">
     <head>
         <meta charset="UTF-8">
-        <title>GNP</title>
+        <title>GNP -
+            {% block title %}
+            {% endblock title %}
+        </title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- Bootstrap CSS -->
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -18,6 +21,8 @@
         <link rel="stylesheet"
               href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
         <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
+        {% block head %}
+        {% endblock head %}
     </head>
     <body class="bg-light">
         <!-- NAVBAR -->

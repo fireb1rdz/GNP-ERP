@@ -1,11 +1,17 @@
 from domain.contracts.entity import PartyServiceInterface
-from apps.entities.models import Entity, PartyRole
+from apps.entities.models import Entity, PartyRole, Party
 
 class PartyService(PartyServiceInterface):
-    def create_party(self, tenant, party_data):
-        pass
+    @staticmethod
+    def create_party(tenant, entity: Entity, role: PartyRole):
+        party = Party.objects.create(
+            tenant=tenant,
+            entity=entity,
+            role=role,
+        )
+        return party
     
-    def get_or_create_party(self, tenant, party_data):
+    def get_or_create_party(self, tenant, entity: Entity, role: PartyRole):
         pass
 
     def update_party(self, tenant, party_id, party_data):

@@ -1,5 +1,5 @@
-from domain.contracts.importers import DocumentImporter
-from apps.fiscal.dto import CTEDTO
+from domain.contracts.importers.fiscal import DocumentImporter
+from domain.dto.fiscal import CTEDTO
 from apps.entities.services.entity_service import EntityService
 from apps.entities.services.entity_address_service import EntityAddressService
 import xml.etree.ElementTree as ET
@@ -12,7 +12,13 @@ class CTEImporter(DocumentImporter):
     }
 
     @classmethod
-    def can_import(cls, root) -> bool:
+    def can_import(cls, xml_file) -> bool:
+        if hasattr(xml_file, "read"):
+            raw_xml = xml_file.read()
+        else:
+            raw_xml = xml_file
+
+        root = ET.fromstring(raw_xml)
         return root.tag.endswith("CTe")
 
     @classmethod

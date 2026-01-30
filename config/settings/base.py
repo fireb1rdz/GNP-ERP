@@ -43,6 +43,7 @@ TENANT_APPS = (
     'apps.users',
     'apps.stock',
     'apps.logistics',
+    'apps.fiscal',
     'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.sites',
@@ -146,3 +147,8 @@ AUTH_USER_MODEL = 'users.User'
 
 # Site ID
 SITE_ID = 1
+
+# Media root
+DEFAULT_FILE_STORAGE = "django_tenants.files.storage.TenantFileSystemStorage"
+
+MULTITENANT_RELATIVE_MEDIA_ROOT = ""  # (default: create sub-directory for each tenant)

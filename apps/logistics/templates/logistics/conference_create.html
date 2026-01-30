@@ -1,5 +1,10 @@
 {% extends "base.html" %}
+{% load static %}
 {% load widget_tweaks %}
+{% block head %}
+    <link rel="stylesheet"
+          href="{% static 'logistics/css/create_conference.css' %}">
+{% endblock head %}
 {% block content %}
     <div class="container py-4">
         <h1 class="mb-4">Criar Conferência</h1>
@@ -30,25 +35,33 @@
                     </div>
                 </div>
             </div>
-            <!-- MANUAL -->
-            <div id="manual-section" class="card mb-4" style="display:none;">
+            <!-- VIA NF-e -->
+            <div id="nfe-section" class="card mb-4" style="display:none;">
                 <div class="card-body">
-                    <h5 class="card-title">Criação Manual</h5>
+                    <h5 class="card-title">Importação por NF-e</h5>
                     <div class="mb-3">
-                        <label class="form-label" for="{{ form.document_type.id_for_label }}">Tipo de documento</label>
-                        {{ form.document_type|add_class:"form-select" }}
-                        {% if form.document_type.errors %}
-                            <div class="invalid-feedback d-block">{{ form.document_type.errors }}</div>
-                        {% endif %}
+                        <label class="form-label" for="{{ form.nfe_files.id_for_label }}">Arquivos NF-e</label>
+                        {{ form.nfe_files|add_class:"form-control" }}
+                        {% if form.nfe_files.errors %}<div class="invalid-feedback d-block">{{ form.nfe_files.errors }}</div>{% endif %}
+                        <div class="form-text">Permite importar múltiplos arquivos.</div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label" for="{{ form.document_number.id_for_label }}">Chave de acesso</label>
-                        {{ form.document_number|add_class:"form-control" }}
-                        {% if form.document_number.errors %}
-                            <div class="invalid-feedback d-block">{{ form.document_number.errors }}</div>
-                        {% endif %}
-                        <div class="form-text">Obrigatório para criação manual.</div>
+                </div>
+            </div>
+            <!-- CHAVE DE ACESSO -->
+            <div id="access-key-section" class="card mb-4" style="display:none;">
+                <div class="card-body">
+                    <h5 class="card-title">Via chave de acesso</h5>
+                    <label class="form-label">Informe a chave de acesso da nota fiscal</label>
+                    <div id="access-key-container" class="form-control d-flex flex-wrap gap-2">
+                        <input type="text"
+                               id="access-key-input"
+                               class="border-0 flex-grow-1"
+                               placeholder="Leia a chave e pressione Enter" />
                     </div>
+                    <!-- Campo REAL enviado ao Django -->
+                    <input type="hidden" name="access_keys" id="access-keys-hidden">
+                    <div class="form-text">Permite informar múltiplas chaves de acesso.</div>
+                    {% if form.access_key.errors %}<div class="invalid-feedback d-block">{{ form.access_key.errors }}</div>{% endif %}
                 </div>
             </div>
             <!-- Entidades -->
@@ -57,18 +70,24 @@
                     <h5 class="card-title">Entidades</h5>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label" for="{{ form.source_entity.id_for_label }}">Origem</label>
-                            {{ form.source_entity|add_class:"form-select" }}
-                            {% if form.source_entity.errors %}
-                                <div class="invalid-feedback d-block">{{ form.source_entity.errors }}</div>
-                            {% endif %}
+                            <label class="form-label" for="{{ form.supplier.id_for_label }}">Fornecedor</label>
+                            {{ form.supplier|add_class:"form-select" }}
+                            {% if form.supplier.errors %}<div class="invalid-feedback d-block">{{ form.supplier.errors }}</div>{% endif %}
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label" for="{{ form.destination_entity.id_for_label }}">Destino</label>
-                            {{ form.destination_entity|add_class:"form-select" }}
-                            {% if form.destination_entity.errors %}
-                                <div class="invalid-feedback d-block">{{ form.destination_entity.errors }}</div>
-                            {% endif %}
+                            <label class="form-label" for="{{ form.carrier.id_for_label }}">Transportadora</label>
+                            {{ form.carrier|add_class:"form-select" }}
+                            {% if form.carrier.errors %}<div class="invalid-feedback d-block">{{ form.carrier.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="{{ form.next_destiny.id_for_label }}">Próximo Destino</label>
+                            {{ form.next_destiny|add_class:"form-select" }}
+                            {% if form.next_destiny.errors %}<div class="invalid-feedback d-block">{{ form.next_destiny.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="{{ form.client.id_for_label }}">Destino final</label>
+                            {{ form.client|add_class:"form-select" }}
+                            {% if form.client.errors %}<div class="invalid-feedback d-block">{{ form.client.errors }}</div>{% endif %}
                         </div>
                     </div>
                 </div>
@@ -91,30 +110,87 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const cteSection = document.getElementById("cte-section");
-    const manualSection = document.getElementById("manual-section");
+    const nfeSection = document.getElementById("nfe-section");
+    const accessKeySection = document.getElementById("access-key-section");
 
     const radios = document.querySelectorAll("input[name='creation_mode']");
     const cteInput = document.getElementById("{{ form.cte_files.id_for_label }}");
-    const docNumberInput = document.getElementById("{{ form.document_number.id_for_label }}");
-    const docTypeSelect = document.getElementById("{{ form.document_type.id_for_label }}");
+    const nfeInput = document.getElementById("{{ form.nfe_files.id_for_label }}");
+    const keyInput = document.getElementById("access-key-input");
+    const container = document.getElementById("access-key-container");
+    const hiddenInput = document.getElementById("access-keys-hidden");
+
+    let accessKeys = [];
+
+    function syncHiddenField() {
+        hiddenInput.value = JSON.stringify(accessKeys);
+    }
+
+    function isValidAccessKey(value) {
+        return /^\d{44}$/.test(value); // chave NF-e tem 44 dígitos
+    }
+
+    function addAccessKey(value) {
+        if (!isValidAccessKey(value)) return;
+        if (accessKeys.includes(value)) return;
+
+        accessKeys.push(value);
+        syncHiddenField();
+
+        const chip = document.createElement("div");
+        chip.className = "access-key-chip";
+        chip.innerHTML = `
+            <span>${value}</span>
+            <button type="button">×</button>
+        `;
+
+        chip.querySelector("button").addEventListener("click", () => {
+            accessKeys = accessKeys.filter(k => k !== value);
+            syncHiddenField();
+            chip.remove();
+        });
+
+        container.insertBefore(chip, keyInput);
+    }
+
+    keyInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            const value = keyInput.value.trim();
+            addAccessKey(value);
+            keyInput.value = "";
+        }
+    });
+
+    container.addEventListener("click", () => keyInput.focus());
 
     function toggleSections() {
         const mode = document.querySelector("input[name='creation_mode']:checked").value;
 
         if (mode === "cte") {
             cteSection.style.display = "block";
-            manualSection.style.display = "none";
+            nfeSection.style.display = "none";
+            accessKeySection.style.display = "none";
 
             cteInput.required = true;
-            docNumberInput.required = false;
-            docTypeSelect.required = false;
-        } else {
+            nfeInput.required = false;
+            accessKeyInput.required = false;
+        } else if (mode === "nfe") {
             cteSection.style.display = "none";
-            manualSection.style.display = "block";
+            nfeSection.style.display = "block";
+            accessKeySection.style.display = "none";
 
             cteInput.required = false;
-            docNumberInput.required = true;
-            docTypeSelect.required = true;
+            nfeInput.required = true;
+            accessKeyInput.required = false;
+        } else if (mode === "access_key") {
+            cteSection.style.display = "none";
+            nfeSection.style.display = "none";
+            accessKeySection.style.display = "block";
+
+            cteInput.required = false;
+            nfeInput.required = false;
+            accessKeyInput.required = true;
         }
     }
 

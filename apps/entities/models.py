@@ -64,7 +64,6 @@ class EntityPhone(TenantAwareModel):
 
 class PartyRole(models.TextChoices):
     CLIENT = "client", "Client"
-    SUPPLIER = "supplier", "Supplier"
     CARRIER = "carrier", "Carrier"
     SENDER  = "sender", "Sender"
     RECEIVER = "receiver", "Receiver"
@@ -83,7 +82,7 @@ class Party(TenantAwareModel):
     role = models.CharField(
         max_length=20,
         choices=PartyRole.choices,
-        default=PartyRole.CLIENT
+        default=PartyRole.CLIENT.value
     )
     alias = models.CharField(max_length=100, blank=True, null=True)
     is_active = models.BooleanField(default=True)

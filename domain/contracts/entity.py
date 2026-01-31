@@ -55,26 +55,6 @@ class PartyServiceInterface(ABC):
     @abstractmethod
     def create_party(self, tenant, party_data):
         pass
-    
-    @abstractmethod
-    def get_or_create_party(self, tenant, party_data):
-        pass
-
-    @abstractmethod
-    def update_party(self, tenant, party_id, party_data):
-        pass
-
-    @abstractmethod
-    def delete_party(self, tenant, party_id):
-        pass
-
-    @abstractmethod
-    def list_parties(self, tenant):
-        pass
-
-    @abstractmethod
-    def get_party(self, tenant, party_id):
-        pass
 
     @abstractmethod
     def can_be(self, entity: Entity, role: str):
@@ -84,15 +64,15 @@ class PartyServiceInterface(ABC):
         pass
 
     @abstractmethod
-    def get_roles(self, entity: Entity):
+    def sync_entity_roles(self, entity, selected_roles):
         """
-        Retorna os papéis da entity.
+        Sincroniza papéis de uma entidade com base nos selecionados no formulário.
         """
         pass
 
     @abstractmethod
-    def get_existing_roles(self):
+    def get_roles_for_entity(self, entity):
         """
-        Retorna os papéis padrão da entity.
+        Retorna os papéis da entity.
         """
         pass

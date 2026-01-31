@@ -16,10 +16,28 @@ class Conference(TenantAwareModel):
     DOCUMENT_TYPE_CHOICES = (
         ('invoice', 'Invoice'),
     )
-    supplier = models.ForeignKey(Party, on_delete=models.PROTECT, related_name="supplier_conferences", null=True, blank=True)
-    carrier = models.ForeignKey(Party, on_delete=models.PROTECT, related_name="carrier_conferences", null=True, blank=True)
-    client = models.ForeignKey(Party, on_delete=models.PROTECT, related_name="client_conferences", null=True, blank=True)
-    next_destiny = models.ForeignKey(Party, on_delete=models.PROTECT, related_name="next_destiny_conferences")
+    CONFERENCE_EVENT_TYPE_CHOICES = (
+        ("load", "Embarcar no veículo"),
+        ("unload", "Desembarcar do veículo"),
+    )
+    origin = models.ForeignKey(
+        Party,
+        on_delete=models.PROTECT,
+        related_name="origin_conferences"
+    )
+    destination = models.ForeignKey(
+        Party,
+        on_delete=models.PROTECT,
+        related_name="destination_conferences"
+    )
+    parent_conference = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="derived_conferences"
+    )
+    event_type = models.CharField(max_length=20, choices=CONFERENCE_EVENT_TYPE_CHOICES)
     document_number = models.CharField(max_length=44, null=True, blank=True)
     document_type = models.CharField(max_length=20, choices=DOCUMENT_TYPE_CHOICES, default='invoice')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')

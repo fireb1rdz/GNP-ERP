@@ -1,6 +1,7 @@
 # apps/logistics/forms.py
 from django import forms
 from apps.entities.models import Party
+from apps.logistics.models import Conference
 
 
 class MultipleFileInput(forms.ClearableFileInput):
@@ -41,14 +42,15 @@ class MultipleNFEFileField(forms.FileField):
 
 class ConferenceCreateForm(forms.Form):
     CREATION_MODE_CHOICES = (
-        ("cte", "Via CT-e"),
-        ("nfe", "Via NF-e"),
+        # ("cte", "Via CT-e"),
+        # ("nfe", "Via NF-e"),
         ("access_key", "Chave de Acesso"),
     )
 
     creation_mode = forms.ChoiceField(
         choices=CREATION_MODE_CHOICES,
         widget=forms.RadioSelect(attrs={"class": "form-check-input"}),
+        initial="access_key"
     )
 
     cte_files = MultipleCTEFileField(required=False)
@@ -60,40 +62,29 @@ class ConferenceCreateForm(forms.Form):
         required=False,
     )
 
-    supplier = forms.ModelChoiceField(
-        queryset=Party.objects.filter(role="supplier"),
+    origin = forms.ModelChoiceField(
+        queryset=Party.objects.filter(role="sender"),
         widget=forms.Select(attrs={"class": "form-select select2"}),
     )
 
-    client = forms.ModelChoiceField(
-        queryset=Party.objects.filter(role="client"),
+    destination = forms.ModelChoiceField(
+        queryset=Party.objects.filter(role="receiver"),
         widget=forms.Select(attrs={"class": "form-select select2"}),
     )
 
-    carrier = forms.ModelChoiceField(
-        queryset=Party.objects.filter(role="carrier"),
+    event_type = forms.ChoiceField(
+        choices=Conference.CONFERENCE_EVENT_TYPE_CHOICES,
         widget=forms.Select(attrs={"class": "form-select select2"})
-    )
-
-    next_destiny = forms.ModelChoiceField(
-        queryset=Party.objects.filter(role="client"),
-        widget=forms.Select(attrs={"class": "form-select select2"}),
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # 🔹 Exibição: "ID - Nome"
-        self.fields["supplier"].label_from_instance = (
+        self.fields["origin"].label_from_instance = (
             lambda obj: f"{obj.id} - {obj.entity.name}"
         )
-        self.fields["client"].label_from_instance = (
-            lambda obj: f"{obj.id} - {obj.entity.name}"
-        )
-        self.fields["carrier"].label_from_instance = (
-            lambda obj: f"{obj.id} - {obj.entity.name}"
-        )
-        self.fields["next_destiny"].label_from_instance = (
+        self.fields["destination"].label_from_instance = (
             lambda obj: f"{obj.id} - {obj.entity.name}"
         )
 

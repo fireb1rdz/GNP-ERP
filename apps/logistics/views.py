@@ -17,8 +17,7 @@ class ConferenceCreateView(View):
         form = ConferenceCreateForm()
         logged_entity = request.user.entity
         if Party.objects.filter(entity=logged_entity, role="carrier").exists():
-            form.fields["carrier"].initial = Party.objects.get(entity=logged_entity, role="carrier")
-            print("sim")
+            form.fields["destination"].initial = Party.objects.get(entity=logged_entity, role="carrier")
         return render(request, self.template_name, {"form": form})
 
     def post(self, request):

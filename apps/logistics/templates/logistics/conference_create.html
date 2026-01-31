@@ -6,7 +6,7 @@
           href="{% static 'logistics/css/create_conference.css' %}">
 {% endblock head %}
 {% block content %}
-    <div class="container py-4">
+    <div class="container-fluid">
         <h1 class="mb-4">Criar Conferência</h1>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
@@ -54,6 +54,7 @@
                     <label class="form-label">Informe a chave de acesso da nota fiscal</label>
                     <div id="access-key-container" class="form-control d-flex flex-wrap gap-2">
                         <input type="text"
+                               maxlength="44"
                                id="access-key-input"
                                class="border-0 flex-grow-1"
                                placeholder="Leia a chave e pressione Enter" />
@@ -70,24 +71,19 @@
                     <h5 class="card-title">Entidades</h5>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label" for="{{ form.supplier.id_for_label }}">Fornecedor</label>
-                            {{ form.supplier|add_class:"form-select" }}
-                            {% if form.supplier.errors %}<div class="invalid-feedback d-block">{{ form.supplier.errors }}</div>{% endif %}
+                            <label class="form-label" for="{{ form.origin.id_for_label }}">Origem</label>
+                            {{ form.origin|add_class:"form-select" }}
+                            {% if form.origin.errors %}<div class="invalid-feedback d-block">{{ form.origin.errors }}</div>{% endif %}
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label" for="{{ form.carrier.id_for_label }}">Transportadora</label>
-                            {{ form.carrier|add_class:"form-select" }}
-                            {% if form.carrier.errors %}<div class="invalid-feedback d-block">{{ form.carrier.errors }}</div>{% endif %}
+                            <label class="form-label" for="{{ form.destination.id_for_label }}">Destino</label>
+                            {{ form.destination|add_class:"form-select" }}
+                            {% if form.destination.errors %}<div class="invalid-feedback d-block">{{ form.destination.errors }}</div>{% endif %}
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label" for="{{ form.next_destiny.id_for_label }}">Próximo Destino</label>
-                            {{ form.next_destiny|add_class:"form-select" }}
-                            {% if form.next_destiny.errors %}<div class="invalid-feedback d-block">{{ form.next_destiny.errors }}</div>{% endif %}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label" for="{{ form.client.id_for_label }}">Destino final</label>
-                            {{ form.client|add_class:"form-select" }}
-                            {% if form.client.errors %}<div class="invalid-feedback d-block">{{ form.client.errors }}</div>{% endif %}
+                            <label class="form-label" for="{{ form.event_type.id_for_label }}">Tipo</label>
+                            {{ form.event_type|add_class:"form-select" }}
+                            {% if form.event_type.errors %}<div class="invalid-feedback d-block">{{ form.event_type.errors }}</div>{% endif %}
                         </div>
                     </div>
                 </div>

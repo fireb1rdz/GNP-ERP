@@ -12,14 +12,13 @@ class ConferenceApplicationService:
     def __init__(self, package_service: PackageServiceInterface):
         self.package_service = package_service
 
-    def create_from_access_key(self, tenant, user, supplier, carrier, client, next_destiny, access_key):
+    def create_from_access_key(self, tenant, user, origin, destination, event_type, access_key):
         conference = Conference.objects.create(
             tenant=tenant,
             user=user,
-            supplier=supplier,
-            carrier=carrier,
-            client=client,
-            next_destiny=next_destiny,
+            origin=origin,
+            destination=destination,
+            event_type=event_type,
             document_number=access_key,
             document_type="invoice"
         )

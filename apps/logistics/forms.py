@@ -80,7 +80,6 @@ class ConferenceCreateForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # 🔹 Exibição: "ID - Nome"
         self.fields["origin"].label_from_instance = (
             lambda obj: f"{obj.id} - {obj.entity.name}"
         )

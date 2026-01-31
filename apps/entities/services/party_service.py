@@ -10,21 +10,6 @@ class PartyService(PartyServiceInterface):
             role=role,
         )
         return party
-    
-    def get_or_create_party(self, tenant, entity: Entity, role: PartyRole):
-        pass
-
-    def update_party(self, tenant, party_id, party_data):
-        pass
-
-    def delete_party(self, tenant, party_id):
-        pass
-
-    def list_parties(self, tenant):
-        pass
-
-    def get_party(self, tenant, party_id):
-        pass
 
     def can_be(self, entity: Entity, role: str):
         """
@@ -32,17 +17,35 @@ class PartyService(PartyServiceInterface):
         """
         return True
 
-    def get_roles(self, entity: Entity):
-        """
-        Retorna os papéis da entity.
-        """
-        pass
-
     def get_existing_roles(self):
+        return PartyRole.choices
+
+    def sync_entity_roles(self, entity, selected_roles):
         """
-        Retorna os papéis existentes da entity.
+        Sincroniza papéis de uma entidade com base nos selecionados no formulário.
         """
-        roles = []
-        for role, translation in PartyRole.choices:
-            roles.append((role, translation))
-        return roles
+
+        current_roles = set(
+            Party.objects.filter(entity=entity)
+            .values_list("role", flat=True)
+        )
+
+        selected_roles = set(selected_roles)
+
+        # Criar novos papéis
+        to_create = selected_roles - current_roles
+        for role in to_create:
+            Party.objects.create(
+                entity=entity,
+                role=role
+            )
+
+        # Remover papéis desmarcados
+        to_remove = current_roles - selected_roles
+        Party.objects.filter(
+            entity=entity,
+            role__in=to_remove
+        ).delete()
+
+    def get_roles_for_entity(self, entity):
+        return Party.objects.filter(entity=entity).values_list("role", flat=True)

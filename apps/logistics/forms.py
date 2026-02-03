@@ -81,10 +81,10 @@ class ConferenceCreateForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         self.fields["origin"].label_from_instance = (
-            lambda obj: f"{obj.id} - {obj.entity.name}"
+            lambda obj: f"{obj.entity.id} - {obj.entity.name}"
         )
         self.fields["destination"].label_from_instance = (
-            lambda obj: f"{obj.id} - {obj.entity.name}"
+            lambda obj: f"{obj.entity.id} - {obj.entity.name}"
         )
 
     def clean(self):
@@ -93,6 +93,7 @@ class ConferenceCreateForm(forms.Form):
         mode = cleaned.get("creation_mode")
         cte_files = cleaned.get("cte_files", [])
         nfe_files = cleaned.get("nfe_files", [])
+        access_keys = cleaned.get("access_keys", [])
 
         if mode == "cte" and not cte_files:
             raise forms.ValidationError(
@@ -104,4 +105,33 @@ class ConferenceCreateForm(forms.Form):
                 "No modo NF-e é obrigatório anexar pelo menos um arquivo."
             )
 
+        if mode == "access_key" and not access_keys:
+            raise forms.ValidationError(
+                "No modo Chave de Acesso é obrigatório informar pelo menos uma chave de acesso."
+            )
+
         return cleaned
+
+    def clean_access_keys(self):
+        raw_keys = self.cleaned_data.get("access_keys", "")
+
+        if not raw_keys:
+            return []
+
+        # Normalização da string
+        keys = raw_keys.replace('"', '')
+        keys = keys.replace('[', '')
+        keys = keys.replace(']', '')
+
+        # Quebra por vírgula
+        keys = [k.strip() for k in keys.split(',') if k.strip()]
+
+        # Validação opcional de tamanho/formato
+        for key in keys:
+            if len(key) != 44:
+                raise forms.ValidationError(
+                    f"Chave de acesso inválida: {key}"
+                )
+
+        return keys
+

@@ -67,7 +67,6 @@ class PartyRole(models.TextChoices):
     CARRIER = "carrier", "Carrier"
     SENDER  = "sender", "Sender"
     RECEIVER = "receiver", "Receiver"
-    WAREHOUSE = "warehouse", "Warehouse"
 
 class Party(TenantAwareModel):
     """

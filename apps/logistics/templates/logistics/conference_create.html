@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
 {% load widget_tweaks %}
+{% block title %}
+    Criar conferência
+{% endblock title %}
 {% block head %}
     <link rel="stylesheet"
           href="{% static 'logistics/css/conference_create.css' %}">
@@ -8,7 +11,11 @@
 {% endblock head %}
 {% block content %}
     <div class="container-fluid">
-        <h1 class="mb-4">Criar Conferência</h1>
+        <div class="position-relative">
+            <h1 class="mb-4">Criar Conferência</h1>
+            <a href="{% url 'logistics:conference_list' %}"
+               class="btn btn-secondary position-absolute top-0 end-0">Voltar</a>
+        </div>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}

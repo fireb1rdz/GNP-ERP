@@ -54,8 +54,15 @@
                     {{ form.carrier }}
                     <label class="form-check-label">Transportadora</label>
                 </div>
+                <div class="col-md-4 form-check">
+                    {{ form.sender }}
+                    <label class="form-check-label">Pode ser origem</label>
+                </div>
+                <div class="col-md-4 form-check">
+                    {{ form.receiver }}
+                    <label class="form-check-label">Pode ser destino</label>
+                </div>
             </div>
-            
             <div class="row mb-4">
                 <div class="col-md-4 form-check">
                     {{ form.is_branch }}

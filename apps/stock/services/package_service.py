@@ -3,7 +3,7 @@ from apps.stock.models import Package, TrackingSequence
 from domain.contracts.stock import PackageServiceInterface
 
 class PackageService(PackageServiceInterface):
-    def generate_tracking_code(tenant):
+    def generate_tracking_code(self, tenant):
         with transaction.atomic():
             seq = (
                 TrackingSequence.objects
@@ -16,11 +16,15 @@ class PackageService(PackageServiceInterface):
 
             return str(seq.current_value).zfill(11)
 
-    def create_generated_package(self, tenant, **data):
-        tracking_code = self.generate_tracking_code(tenant)
+    def create_generated_package(self, tenant, user, holder, package_code=None):
+        if not package_code:
+            tracking_code = self.generate_tracking_code(tenant)
+        else:
+            tracking_code = package_code
         return Package.objects.create(
             tenant=tenant,
             tracking_code=tracking_code,
             status='generated',
-            **data
+            created_by=holder,
+            holder=holder
         )

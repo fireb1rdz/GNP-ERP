@@ -56,8 +56,8 @@ class ConferenceItem(TenantAwareModel):
         ('ok', 'Ok'),
         ('faulty', 'Faulty'),
     )
-    conference = models.ForeignKey(Conference, on_delete=models.PROTECT, related_name="items")
-    package = models.ForeignKey(Package, on_delete=models.PROTECT, related_name="conference_items")
+    conference = models.ForeignKey(Conference, on_delete=models.PROTECT, related_name="packages")
+    package = models.ForeignKey(Package, on_delete=models.PROTECT, related_name="conference_packages")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

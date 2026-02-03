@@ -3,57 +3,54 @@
     Conferências
 {% endblock title %}
 {% block head %}
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-    <script>
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-    </script>
 {% endblock head %}
 {% block content %}
+    <div class="position-relative">
+        <h1 class="mb-4">Conferências</h1>
+        <a href="{% url 'logistics:conference_create' %}"
+           class="btn btn-primary position-absolute top-0 end-0">Criar Conferência</a>
+    </div>
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Origem</th>
-                    <th>Transportadora</th>
-                    <th>Destino</th>
-                    <th>N. Documento</th>
-                    <th>Tipo Documento</th>
-                    <th>Início</th>
-                    <th>Fim</th>
-                    <th>Status</th>
-                    <th>Ações</th>
+                    <th data-bs-toggle="tooltip" data-bs-title="Origem" class="col-1">Origem</th>
+                    <th data-bs-toggle="tooltip" data-bs-title="Destino" class="col-1">Destino</th>
+                    <th data-bs-toggle="tooltip" data-bs-title="N. Documento" class="col-1">N. Documento</th>
+                    <th data-bs-toggle="tooltip" data-bs-title="Tipo Documento" class="col-1">Tipo Documento</th>
+                    <th data-bs-toggle="tooltip" data-bs-title="Início" class="col-1">Início</th>
+                    <th data-bs-toggle="tooltip" data-bs-title="Fim" class="col-1">Fim</th>
+                    <th data-bs-toggle="tooltip" data-bs-title="Criado por" class="col-1">Criado por</th>
+                    <th data-bs-toggle="tooltip" data-bs-title="Status" class="col-1">Status</th>
+                    <th data-bs-toggle="tooltip" data-bs-title="Ações" class="col-1">Ações</th>
                 </tr>
             </thead>
             <tbody>
                 {% for conference in conferences %}
                     <tr>
-                        <td data-bs-toggle="tooltip"
-                            data-bs-title="{{ conference.supplier.entity.name }}">
-                            {{ conference.supplier.entity.id }} - {{ conference.supplier.entity.name }}
-                        </td>
-                        <td data-bs-toggle="tooltip"
-                            data-bs-title="{{ conference.carrier.entity.name }}">
-                            {{ conference.carrier.entity.id }} - {{ conference.carrier.entity.name }}
-                        </td>
-                        <td data-bs-toggle="tooltip"
-                            data-bs-title="{{ conference.client.entity.name }}">
-                            {{ conference.client.entity.id }} - {{ conference.client.entity.name }}
-                        </td>
-                        <td data-bs-toggle="tooltip"
-                            data-bs-title="{{ conference.document_number }}">{{ conference.document_number }}</td>
-                        <td data-bs-toggle="tooltip"
-                            data-bs-title="{{ conference.document_type }}">{{ conference.document_type }}</td>
-                        <td data-bs-toggle="tooltip" data-bs-title="{{ conference.start_date }}">{{ conference.start_date }}</td>
-                        <td data-bs-toggle="tooltip" data-bs-title="{{ conference.end_date }}">{{ conference.end_date }}</td>
-                        <td data-bs-toggle="tooltip" data-bs-title="{{ conference.status }}">{{ conference.status }}</td>
                         <td>
-                            <a href="{% url 'logistics:conference_detail' conference.id %}"
-                               class="btn btn-primary">Detalhes</a>
-                            <a href="{% url 'logistics:conference_update' conference.id %}"
-                               class="btn btn-warning">Editar</a>
-                            <a href="{% url 'logistics:conference_delete' conference.id %}"
-                               class="btn btn-danger">Excluir</a>
+                            <a href="{% url 'entities:entity_update' conference.origin.entity.id %}">
+                                {{ conference.origin.entity.id }} - {{ conference.origin.entity.name }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{% url 'entities:entity_update' conference.destination.entity.id %}">
+                                {{ conference.destination.entity.id }} - {{ conference.destination.entity.name }}
+                            </a>
+                        </td>
+                        <td>{{ conference.document_number }}</td>
+                        <td>{{ conference.document_type }}</td>
+                        <td>{{ conference.start_date|date:"d/m/Y"|default_if_none:"-" }}</td>
+                        <td>{{ conference.end_date|date:"d/m/Y"|default_if_none:"-" }}</td>
+                        <td>{{ conference.created_by.username }}</td>
+                        <td>{{ conference.status }}</td>
+                        <td>
+                            {% comment %} <a href="{% url 'logistics:conference_detail' conference.id %}" class="btn btn-primary">Detalhes</a> {% endcomment %}
+                            {% comment %} <a href="{% url 'logistics:conference_update' conference.id %}"
+    class="btn btn-warning">Editar</a> {% endcomment %}
+                            {% comment %} <a href="{% url 'logistics:conference_delete' conference.id %}" class="btn btn-danger">Excluir</a> {% endcomment %}
+                            <a href="{% url 'logistics:conference_action' conference.id %}"
+                               class="btn btn-success">Conferir</a>
                         </td>
                     </tr>
                 {% endfor %}

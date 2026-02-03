@@ -12,10 +12,10 @@ class ConferenceApplicationService:
     def __init__(self, package_service: PackageServiceInterface):
         self.package_service = package_service
 
-    def create_from_access_key(self, tenant, user, origin, destination, event_type, access_key):
+    def create_conference_by_access_key(self, tenant, user, origin, destination, event_type, access_key):
         conference = Conference.objects.create(
             tenant=tenant,
-            user=user,
+            created_by=user,
             origin=origin,
             destination=destination,
             event_type=event_type,
@@ -55,3 +55,24 @@ class ConferenceApplicationService:
                 package=package,
                 status="pending",
             )
+
+    def add_package_to_conference(self, tenant, user, conference_id, package_code):
+        conference = Conference.objects.get(tenant=tenant, id=conference_id)
+        package = self.package_service.create_generated_package(
+            tenant=tenant,
+            user=user,
+            holder=conference.origin,
+            package_code=package_code,
+        )
+        conference_item = ConferenceItem.objects.create(
+            tenant=tenant,
+            conference=conference,
+            package=package,
+            status="ok",
+        )
+
+        conference.packages.add(conference_item)
+
+    def get_origin(self, tenant, conference_id):
+        conference = Conference.objects.get(tenant=tenant, id=conference_id)
+        return conference.origin

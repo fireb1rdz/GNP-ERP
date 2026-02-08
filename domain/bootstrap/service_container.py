@@ -6,6 +6,7 @@ from domain.contracts.stock import PackageServiceInterface
 from apps.stock.services.package_service import PackageService
 from apps.fiscal.services.process_transport_document_service import ProcessTransportDocumentService
 from apps.fiscal.module import FiscalModule
+from apps.dashboards.module import DashboardsModule
 
 def get_party_service() -> PartyServiceInterface:
     return PartyService()
@@ -25,3 +26,6 @@ def get_fiscal_module():
     return FiscalModule(
         process_transport_document_service=get_process_transport_document_service()
     )
+
+def get_dashboards_module():
+    return DashboardsModule()

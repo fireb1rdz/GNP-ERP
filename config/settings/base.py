@@ -44,6 +44,7 @@ TENANT_APPS = (
     'apps.stock',
     'apps.logistics',
     'apps.fiscal',
+    'apps.dashboards',
     'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.sites',

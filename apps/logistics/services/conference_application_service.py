@@ -130,7 +130,14 @@ class ConferenceApplicationService:
 
     def finish_conference(self, tenant, conference_id, user):
         conference = Conference.objects.get(tenant=tenant, id=conference_id)
-        if self.party_service.party_is_system(conference.destination):
+        already_created = Conference.objects.filter(
+            tenant=tenant,
+            parent_conference=conference.parent_conference,
+            event_type="unload",
+            document_number=conference.document_number,
+            document_type=conference.document_type
+        ).exists()
+        if self.party_service.party_is_system(conference.destination) and not already_created:
             self.create_conference_in_destination(tenant, conference_id, user)
         conference.status = "finished"
         conference.finished_by = user
@@ -179,3 +186,6 @@ class ConferenceApplicationService:
         conference_item.read_by = user
         conference_item.read_at = now()
         conference_item.save()
+
+    def get_packages_read_in_month(self, tenant, month, year):
+        return ConferenceItem.objects.filter(tenant=tenant, read_at__month=month, read_at__year=year, status="ok").count()

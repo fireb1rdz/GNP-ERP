@@ -6,6 +6,10 @@ from django.utils.translation import gettext_lazy as _
 
 User = get_user_model()
 
+class PaymentMethod(models.Model):
+    name = models.CharField(max_length=50)
+    description = models.TextField(blank=True, null=True)
+
 class FinancialEntry(TenantAwareModel):
     direction = models.CharField(
         max_length=10,
@@ -38,6 +42,16 @@ class FinancialEntry(TenantAwareModel):
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
 
+    class Meta:
+        verbose_name = _("Financial Entry")
+        verbose_name_plural = _("Financial Entries")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["counterparty", "reference_month", "reference_year", "direction"],
+                name="unique_monthly_billing"
+            )
+        ]
+
 class Installment(models.Model):
     financial_entry = models.ForeignKey(
         FinancialEntry,
@@ -54,7 +68,6 @@ class Installment(models.Model):
         choices=[
             ("open", _("Open")),
             ("paid", _("Paid")),
-            ("overdue", _("Overdue")),
         ],
         default="open"
     )
@@ -68,7 +81,8 @@ class Payment(models.Model):
 
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     paid_at = models.DateTimeField()
-    method = models.CharField(max_length=50)
+    method = models.ForeignKey(PaymentMethod, on_delete=models.PROTECT)
 
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
+

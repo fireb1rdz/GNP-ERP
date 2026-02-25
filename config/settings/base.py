@@ -168,3 +168,49 @@ SESSION_EXPIRE_SECONDS = 60 * 60 * 5
 SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
 
 SESSION_TIMEOUT_REDIRECT = '/login/'
+
+# LOGGING
+
+LOG_DIR = os.path.join(BASE_DIR, "logs")
+os.makedirs(LOG_DIR, exist_ok=True)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "%(asctime)s [%(levelname)s] [%(name)s] %(message)s"
+        },
+        "structured": {
+            "format": "%(asctime)s | %(levelname)s | %(name)s | %(message)s | %(schema)s | %(reference_month)s | %(reference_year)s"
+        },
+    },
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": os.path.join(LOG_DIR, "finance.log"),
+            "when": "midnight",
+            "backupCount": 30,
+            "formatter": "verbose",
+        },
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "celery_file": {
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": os.path.join(LOG_DIR, "celery.log"),
+            "when": "midnight",
+            "backupCount": 30,
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "apps.finance": {
+            "handlers": ["file", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}

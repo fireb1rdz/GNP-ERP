@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.db.models import Q
 from django.views.generic import ListView
+from django.utils.translation import gettext_lazy as _
 from .models import Conference, ConferenceItem
 # from domain.schemas.conference_table import ConferenceTableSchema
 from domain.bootstrap.service_container import get_conference_application_service, get_package_service

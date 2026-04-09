@@ -5,28 +5,24 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
-    # Ajuste o 'config.wsgi' se o seu projeto tiver outro nome de pasta raiz
     command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
-
-    # Em produção com Traefik, não precisamos expor a porta 8000 para o mundo,
-    # o Traefik falará com ela internamente pela rede.
     expose:
       - "8000"
-
     env_file:
       - .env
-
     networks:
       - traefik-public
-
     labels:
       - "traefik.enable=true"
-      # Substitua pelo seu domínio real ou pelo domínio de demo
+      # 1. Mudamos para o entrypoint 'websecure' (HTTPS)
+      - "traefik.http.routers.gnpcargo.entrypoints=websecure"
       - "traefik.http.routers.gnpcargo.rule=Host(`cargo.gnpsistemas.com.br`) && !PathPrefix(`/static/`)"
-      - "traefik.http.routers.gnpcargo.entrypoints=web"
-      # Indica ao Traefik em qual porta o Gunicorn está ouvindo
+      - "traefik.http.routers.gnpcargo.tls=true"
+      - "traefik.http.routers.gnpcargo.tls.certresolver=letsencrypt"
+      # 2. Definimos uma prioridade para evitar conflito com a regra do static
+      - "traefik.http.routers.gnpcargo.priority=10"
       - "traefik.http.services.gnpcargo.loadbalancer.server.port=8000"
-      - "traefik.http.routers.gnpcargo-static.priority=1"
+
     volumes:
       - static_volume:/app/staticfiles
 
@@ -39,9 +35,14 @@ services:
       - traefik-public
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.static.rule=Host(`cargo.gnpsistemas.com.br`) && PathPrefix(`/static/`)"
-      - "traefik.http.services.static.loadbalancer.server.port=80"
-      - "traefik.http.routers.static.priority=100"
+      # 3. Nome único para o roteador de estáticos e HTTPS
+      - "traefik.http.routers.gnpcargo-static.rule=Host(`cargo.gnpsistemas.com.br`) && PathPrefix(`/static/`)"
+      - "traefik.http.routers.gnpcargo-static.entrypoints=websecure"
+      - "traefik.http.routers.gnpcargo-static.tls=true"
+      - "traefik.http.routers.gnpcargo-static.tls.certresolver=letsencrypt"
+      # 4. Prioridade alta para garantir que o PathPrefix funcione antes da regra geral
+      - "traefik.http.routers.gnpcargo-static.priority=100"
+      - "traefik.http.services.gnpcargo-static.loadbalancer.server.port=80"
 
 networks:
   traefik-public:

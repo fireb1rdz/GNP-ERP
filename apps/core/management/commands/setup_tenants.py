@@ -2,10 +2,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.apps import apps
 from django.utils.text import slugify
-from django_tenants.utils import (
-    get_tenant_model,
-    get_public_schema_name,
-)
+from django_tenants.utils import get_tenant_model, get_public_schema_name
 
 
 def get_domain_model():
@@ -13,21 +10,12 @@ def get_domain_model():
 
 
 class Command(BaseCommand):
-    help = "Garante tenant público + tenant principal com domínio."
+    help = "Garante tenant público + tenant principal + domínio"
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--domain",
-            default="cargo.gnpsistemas.com.br",
-        )
-        parser.add_argument(
-            "--tenant-name",
-            default="GNP Sistemas",
-        )
-        parser.add_argument(
-            "--schema",
-            default="gnp",  # 👈 tenant real
-        )
+        parser.add_argument("--domain", default="cargo.gnpsistemas.com.br")
+        parser.add_argument("--tenant-name", default="GNP Sistemas")
+        parser.add_argument("--schema", default="gnp")
 
     def handle(self, *args, **options):
         TenantModel = get_tenant_model()
@@ -36,12 +24,14 @@ class Command(BaseCommand):
         domain_name = options["domain"].strip().lower()
         tenant_name = options["tenant_name"].strip()
         schema_name = options["schema"].strip().lower()
+        slug = slugify(tenant_name)
+
         public_schema = get_public_schema_name()
 
-        self.stdout.write(f"Inicializando tenants...")
+        self.stdout.write("Inicializando tenants...")
 
         # =========================================
-        # 1) GARANTE PUBLIC (infra)
+        # PUBLIC
         # =========================================
         public = TenantModel.objects.filter(schema_name=public_schema).first()
 
@@ -55,54 +45,56 @@ class Command(BaseCommand):
             self.stdout.write("Public já existe")
 
         # =========================================
-        # 2) GARANTE TENANT REAL (gnp)
+        # TENANT REAL (CORRIGIDO)
         # =========================================
-        tenant = TenantModel.objects.filter(schema_name=schema_name).first()
+        tenant = (
+            TenantModel.objects.filter(schema_name=schema_name).first()
+            or TenantModel.objects.filter(slug=slug).first()
+        )
 
         if not tenant:
             tenant = TenantModel.objects.create(
                 schema_name=schema_name,
                 name=tenant_name,
-                slug=slugify(tenant_name),
+                slug=slug,
             )
-            self.stdout.write(
-                self.style.SUCCESS(f"Tenant '{schema_name}' criado")
-            )
+            self.stdout.write(self.style.SUCCESS(f"Tenant '{schema_name}' criado"))
         else:
             changed = False
 
-            if hasattr(tenant, "name") and tenant.name != tenant_name:
+            # garante schema correto
+            if tenant.schema_name != schema_name:
+                tenant.schema_name = schema_name
+                changed = True
+
+            # garante nome
+            if tenant.name != tenant_name:
                 tenant.name = tenant_name
                 changed = True
 
-            if hasattr(tenant, "slug"):
-                new_slug = slugify(tenant_name)
-                if tenant.slug != new_slug:
-                    tenant.slug = new_slug
-                    changed = True
+            # ⚠️ NÃO altera slug se já existir (evita conflito)
+            if not tenant.slug:
+                tenant.slug = slug
+                changed = True
 
             if changed:
                 tenant.save()
-                self.stdout.write(
-                    self.style.SUCCESS(f"Tenant '{schema_name}' atualizado")
-                )
+                self.stdout.write(self.style.SUCCESS(f"Tenant '{schema_name}' atualizado"))
             else:
                 self.stdout.write(f"Tenant '{schema_name}' já existe")
 
         # =========================================
-        # 3) GARANTE DOMAIN
+        # DOMAIN
         # =========================================
         domain = DomainModel.objects.filter(domain=domain_name).first()
 
         if not domain:
             DomainModel.objects.create(
                 domain=domain_name,
-                tenant=tenant,  # 👈 IMPORTANTE (não é public)
+                tenant=tenant,
                 is_primary=True,
             )
-            self.stdout.write(
-                self.style.SUCCESS(f"Domínio '{domain_name}' criado")
-            )
+            self.stdout.write(self.style.SUCCESS(f"Domínio '{domain_name}' criado"))
         else:
             changed = False
 
@@ -116,10 +108,8 @@ class Command(BaseCommand):
 
             if changed:
                 domain.save()
-                self.stdout.write(
-                    self.style.SUCCESS(f"Domínio '{domain_name}' atualizado")
-                )
+                self.stdout.write(self.style.SUCCESS(f"Domínio '{domain_name}' atualizado"))
             else:
                 self.stdout.write(f"Domínio '{domain_name}' já existe")
 
-        self.stdout.write(self.style.SUCCESS("Ambiente pronto "))
+        self.stdout.write(self.style.SUCCESS("Ambiente pronto 🚀"))
